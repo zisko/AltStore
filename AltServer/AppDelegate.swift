@@ -402,7 +402,9 @@ private extension AppDelegate
             item.button?.image = NSImage(named: "MenuBarIcon")
             self.statusItem = item
         }
-    }@IBAction private func uninstallMailPlugin(_ sender: NSMenuItem)
+    }
+    
+    @IBAction private func uninstallMailPlugin(_ sender: NSMenuItem)
     {
         self.pluginManager.uninstallMailPlugin { (result) in
             DispatchQueue.main.async {
