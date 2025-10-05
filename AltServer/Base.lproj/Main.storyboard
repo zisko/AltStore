@@ -63,6 +63,7 @@
                         <outlet property="authenticationPasswordTextField" destination="9rp-Vx-rvB" id="ZoC-DI-jzQ"/>
                         <outlet property="connectedDevicesMenu" destination="KJ9-WY-pW1" id="Mcv-64-iFU"/>
                         <outlet property="enableJITMenu" destination="la4-Sa-L3C" id="YrW-hR-uA7"/>
+                        <outlet property="hideDockIconMenuItem" destination="hDI-cK-XpL" id="hDI-01-OUT"/>
                         <outlet property="installAltStoreMenuItem" destination="MJ8-Lt-SSV" id="KYp-c5-8Ru"/>
                         <outlet property="installMailPluginMenuItem" destination="3CM-gV-X2G" id="lio-ha-z0S"/>
                         <outlet property="launchAtLoginMenuItem" destination="IyR-FQ-upe" id="Fxn-EP-hwH"/>
@@ -123,6 +124,9 @@
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="1ZZ-BB-xHy"/>
                                         <menuItem title="Launch at Login" id="IyR-FQ-upe" userLabel="Launch At Login">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                        </menuItem>
+                                        <menuItem title="Hide Dock Icon" id="hDI-cK-XpL" userLabel="Hide Dock Icon">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                         </menuItem>
                                         <menuItem title="Uninstall Mail Plug-in…" id="3CM-gV-X2G" userLabel="Mail Plug-in">

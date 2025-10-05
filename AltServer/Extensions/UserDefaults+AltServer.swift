@@ -28,11 +28,26 @@ extension UserDefaults
         }
     }
     
+    var isDockIconHidden: Bool {
+        get {
+            return self.bool(forKey: "isDockIconHidden")
+        }
+        set {
+            self.set(newValue, forKey: "isDockIconHidden")
+        }
+    }
+    
     func registerDefaults()
     {
         if self.serverID == nil
         {
             self.serverID = UUID().uuidString
+        }
+        
+        // Default to hiding dock icon (current behavior)
+        if self.object(forKey: "isDockIconHidden") == nil
+        {
+            self.isDockIconHidden = true
         }
     }
 }
