@@ -58,9 +58,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     {
         UserDefaults.standard.registerDefaults()
         
-        // Check if app was launched manually and alert if menu bar icon is missing
-        self.checkForMissingMenuBarIcon()
-        
         UNUserNotificationCenter.current().delegate = self
         
         ServerConnectionManager.shared.start()
@@ -79,6 +76,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         // Update activation policy based on dock icon setting
         self.updateActivationPolicy()
+        
+        // Check if app was launched manually and alert if menu bar icon is missing
+        // Must be called after status item is created so we can check isVisible
+        self.checkForMissingMenuBarIcon()
         
         self.appMenu.delegate = self
         
@@ -358,8 +359,12 @@ private extension AppDelegate
         // Only check if dock icon is hidden
         guard UserDefaults.standard.isDockIconHidden else { return }
         
-        // When dock icon is hidden and app is launched manually (e.g., from Finder),
-        // the user might have removed the menu bar icon. Show alert to ensure they can access the app.
+        // Check if the status item is actually not visible
+        // This happens when the user has cmd+dragged the icon off the menu bar
+        guard let statusItem = self.statusItem, !statusItem.isVisible else { return }
+        
+        // When dock icon is hidden and menu bar icon is not visible,
+        // the user has no way to access the app. Show alert to restore menu bar access.
         // We delay this to allow the app to fully initialize.
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
             self?.showMenuBarIconAlert()
@@ -381,7 +386,7 @@ private extension AppDelegate
         let alert = NSAlert()
         alert.alertStyle = .informational
         alert.messageText = NSLocalizedString("AltServer Menu Bar Access", comment: "")
-        alert.informativeText = NSLocalizedString("AltServer runs as a menu bar app with the dock icon hidden. If you've removed the menu bar icon, click \"Show in Menu Bar\" to restore it.", comment: "")
+        alert.informativeText = NSLocalizedString("AltServer runs as a menu bar app with the dock icon hidden. The menu bar icon has been removed. Click \"Show in Menu Bar\" to restore it.", comment: "")
         
         alert.addButton(withTitle: NSLocalizedString("Show in Menu Bar", comment: ""))
         alert.addButton(withTitle: NSLocalizedString("OK", comment: ""))
@@ -391,16 +396,8 @@ private extension AppDelegate
         let response = alert.runModal()
         if response == .alertFirstButtonReturn
         {
-            // Re-create the status item to make it visible
-            if let statusItem = self.statusItem
-            {
-                NSStatusBar.system.removeStatusItem(statusItem)
-            }
-            
-            let item = NSStatusBar.system.statusItem(withLength: -1)
-            item.menu = self.appMenu
-            item.button?.image = NSImage(named: "MenuBarIcon")
-            self.statusItem = item
+            // Set isVisible to true to restore the status item in the menu bar
+            self.statusItem?.isVisible = true
         }
     }
     
