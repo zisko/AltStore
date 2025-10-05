@@ -8,6 +8,7 @@
 
 import Cocoa
 import UserNotifications
+import Carbon
 
 import AltSign
 
@@ -350,7 +351,9 @@ private extension AppDelegate
     func checkForMissingMenuBarIcon()
     {
         // Only check if launched manually (not as login item)
-        guard !LaunchAtLogin.wasLaunchedAtLogin else { return }
+        // Check if the app was launched by the user (not by login item mechanism)
+        let launchedByUser = !self.wasLaunchedAsLoginItem()
+        guard launchedByUser else { return }
         
         // Only check if dock icon is hidden
         guard UserDefaults.standard.isDockIconHidden else { return }
@@ -361,6 +364,16 @@ private extension AppDelegate
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
             self?.showMenuBarIconAlert()
         }
+    }
+    
+    func wasLaunchedAsLoginItem() -> Bool
+    {
+        // Check if the app was launched as a login item
+        guard let event = NSAppleEventManager.shared().currentAppleEvent else { return false }
+        
+        // Check for login item launch event
+        return event.eventID == kAEOpenApplication &&
+               event.paramDescriptor(forKeyword: keyAEPropData)?.enumCodeValue == keyAELaunchedAsLogInItem
     }
     
     func showMenuBarIconAlert()
@@ -389,8 +402,7 @@ private extension AppDelegate
             item.button?.image = NSImage(named: "MenuBarIcon")
             self.statusItem = item
         }
-    }
-    @IBAction private func uninstallMailPlugin(_ sender: NSMenuItem)
+    }@IBAction private func uninstallMailPlugin(_ sender: NSMenuItem)
     {
         self.pluginManager.uninstallMailPlugin { (result) in
             DispatchQueue.main.async {
